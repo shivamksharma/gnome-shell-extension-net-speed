@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/GNOME-42--49-4A86CF?style=flat-square&logo=gnome&logoColor=white" alt="GNOME 42-49">
+  <img src="https://img.shields.io/badge/GNOME-42--44-4A86CF?style=flat-square&logo=gnome&logoColor=white" alt="GNOME 42-44">
   <img src="https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square" alt="License">
   <img src="https://img.shields.io/badge/Version-1.0-green?style=flat-square" alt="Version">
 </p>
@@ -39,11 +39,11 @@
 | 42                  | ✅        |
 | 43                  | ✅        |
 | 44                  | ✅        |
-| 45                  | ✅        |
-| 46                  | ✅        |
-| 47                  | ✅        |
-| 48                  | ✅        |
-| 49                  | ✅        |
+| 45                  | ❌ (Requires ESM update) |
+| 46                  | ❌        |
+| 47                  | ❌        |
+| 48                  | ❌        |
+| 49                  | ❌        |
 
 ---
 
