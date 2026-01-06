@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist gettext-domain="netspeed">
-    <schema id="org.gnome.shell.extensions.netspeed" path="/org/gnome/shell/extensions/netspeed/">
+    <schema id="org.gnome.shell.extensions.netspeed_plus" path="/org/gnome/shell/extensions/netspeed_plus/">
 
         <!-- Update interval in seconds -->
         <key name="update-interval" type="d">
