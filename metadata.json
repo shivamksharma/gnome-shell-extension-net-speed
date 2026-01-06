@@ -1,0 +1,14 @@
+{
+    "name": "Net Speed",
+    "description": "Display real-time network download and upload speed in the top panel",
+    "uuid": "netspeed@shivamksharma.github.io",
+    "shell-version": [
+        "42",
+        "43",
+        "44"
+    ],
+    "version": 1,
+    "url": "https://github.com/shivamksharma/gnome-shell-extension-net-speed",
+    "settings-schema": "org.gnome.shell.extensions.netspeed",
+    "gettext-domain": "netspeed"
+}
