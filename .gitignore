@@ -1,0 +1,23 @@
+# Compiled schemas
+schemas/gschemas.compiled
+
+# Packaged extensions
+*.shell-extension.zip
+*.zip
+
+# Logs
+*.log
+
+# Editor directories
+.vscode/
+.idea/
+.project
+.settings/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Backup files
+*~
+*.bak
