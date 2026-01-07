@@ -34,16 +34,16 @@
 
 ## 🖥️ Compatibility
 
-| GNOME Shell Version | Supported |
-|:-------------------:|:---------:|
-| 42                  | ✅        |
-| 43                  | ✅        |
-| 44                  | ✅        |
-| 45                  | ❌ (Requires ESM update) |
-| 46                  | ❌        |
-| 47                  | ❌        |
-| 48                  | ❌        |
-| 49                  | ❌        |
+| GNOME Shell Version |        Supported         |
+| :-----------------: | :----------------------: |
+|         42          |            ✅            |
+|         43          |            ✅            |
+|         44          |            ✅            |
+|         45          | ❌ (Requires ESM update) |
+|         46          |            ❌            |
+|         47          |            ❌            |
+|         48          |            ❌            |
+|         49          |            ❌            |
 
 ---
 
@@ -52,28 +52,33 @@
 ### Method 1: Manual Installation
 
 1. **Clone or download** this repository:
+
    ```bash
    git clone https://github.com/yourusername/netspeed-gnome-extension.git
    cd netspeed-gnome-extension
    ```
 
 2. **Create the extension directory**:
+
    ```bash
    mkdir -p ~/.local/share/gnome-shell/extensions/netspeed@nettu.local
    ```
 
 3. **Copy extension files**:
+
    ```bash
    cp -r extension.js metadata.json prefs.js schemas ~/.local/share/gnome-shell/extensions/netspeed@nettu.local/
    ```
 
 4. **Compile the GSettings schema**:
+
    ```bash
    cd ~/.local/share/gnome-shell/extensions/netspeed@nettu.local/schemas
    glib-compile-schemas .
    ```
 
 5. **Restart GNOME Shell**:
+
    - On **X11**: Press `Alt+F2`, type `r`, and press Enter
    - On **Wayland**: Log out and log back in
 
@@ -91,32 +96,33 @@ Coming soon on [extensions.gnome.org](https://extensions.gnome.org)
 ## ⚙️ Configuration
 
 Access the extension preferences through:
+
 - **GNOME Extensions app** → Net Speed → Settings
 - **Command line**: `gnome-extensions prefs netspeed@nettu.local`
 
 ### Display Settings
 
-| Option | Description | Default |
-|--------|-------------|---------|
+| Option                  | Description                             | Default    |
+| ----------------------- | --------------------------------------- | ---------- |
 | **Show Download Speed** | Display download speed (↓) in the panel | ✅ Enabled |
-| **Show Upload Speed** | Display upload speed (↑) in the panel | ✅ Enabled |
+| **Show Upload Speed**   | Display upload speed (↑) in the panel   | ✅ Enabled |
 
 ### Unit Settings
 
-| Mode | Description |
-|------|-------------|
-| **Auto** | Automatically switches between KB/s and MB/s (threshold: 1000 KB/s) |
-| **KB/s only** | Always display speed in Kilobytes per second |
-| **MB/s only** | Always display speed in Megabytes per second |
+| Mode          | Description                                                         |
+| ------------- | ------------------------------------------------------------------- |
+| **Auto**      | Automatically switches between KB/s and MB/s (threshold: 1000 KB/s) |
+| **KB/s only** | Always display speed in Kilobytes per second                        |
+| **MB/s only** | Always display speed in Megabytes per second                        |
 
 ### Update Interval
 
-| Interval | Use Case |
-|----------|----------|
+| Interval        | Use Case                          |
+| --------------- | --------------------------------- |
 | **0.5 seconds** | High precision (higher CPU usage) |
-| **1 second** | Balanced (default) |
-| **2 seconds** | Battery-friendly |
-| **5 seconds** | Minimal resource usage |
+| **1 second**    | Balanced (default)                |
+| **2 seconds**   | Battery-friendly                  |
+| **5 seconds**   | Minimal resource usage            |
 
 ---
 
@@ -131,6 +137,7 @@ Access the extension preferences through:
 ### Ignored Interfaces
 
 The extension automatically ignores:
+
 - `lo` — Loopback
 - `docker*` — Docker bridge networks
 - `br-*` — Bridge networks
@@ -180,6 +187,7 @@ journalctl -f -o cat /usr/bin/gnome-shell
 ```
 
 Enable looking glass for debugging:
+
 - Press `Alt+F2` and type `lg` (X11 only)
 
 ### Testing Changes
@@ -216,6 +224,7 @@ This project follows [Conventional Commits](https://www.conventionalcommits.org/
 ## 📝 Changelog
 
 ### v1.0.0 (Initial Release)
+
 - ✅ Real-time download and upload speed display
 - ✅ Automatic active interface detection
 - ✅ Configurable update interval (0.5s - 5s)
