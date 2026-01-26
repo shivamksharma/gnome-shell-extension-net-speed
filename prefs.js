@@ -1,149 +1,229 @@
-import Adw from "gi://Adw";
-import Gio from "gi://Gio";
-import Gtk from "gi://Gtk";
+/* prefs.js
+ *
+ * Net Speed Plus - GNOME Shell Extension Preferences
+ * Compatible with GNOME Shell 42-49 using classic GJS syntax
+ */
 
-import { ExtensionPreferences } from "resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js";
+const Gio = imports.gi.Gio;
+const Gtk = imports.gi.Gtk;
 
-export default class NetSpeedPreferences extends ExtensionPreferences {
-  fillPreferencesWindow(window) {
-    const settings = this.getSettings();
+const ExtensionUtils = imports.misc.extensionUtils;
 
-    // Create a preferences page
-    const page = new Adw.PreferencesPage({
-      title: "General",
-      icon_name: "preferences-system-symbolic",
+/**
+ * Called when preferences are loaded (GNOME 42-44)
+ */
+function init() {
+    // Nothing to initialize here
+}
+
+/**
+ * Build the preferences widget (GNOME 42-44 compatible)
+ * @returns {Gtk.Widget} The preferences widget
+ */
+function buildPrefsWidget() {
+    let settings = ExtensionUtils.getSettings('org.gnome.shell.extensions.netspeed_plus');
+
+    // GNOME 42+ uses GTK4 for preferences
+    // Create the main box
+    let mainBox = new Gtk.Box({
+        orientation: Gtk.Orientation.VERTICAL,
+        margin_top: 24,
+        margin_bottom: 24,
+        margin_start: 24,
+        margin_end: 24,
+        spacing: 18,
     });
-    window.add(page);
 
     // =========================================================================
-    // Display Settings Group
+    // Display Settings Frame
     // =========================================================================
-    const displayGroup = new Adw.PreferencesGroup({
-      title: "Display Settings",
-      description: "Configure what speeds to show in the panel",
+    let displayFrameLabel = new Gtk.Label({
+        label: '<b>Display Settings</b>',
+        use_markup: true,
+        halign: Gtk.Align.START,
     });
-    page.add(displayGroup);
+    let displayFrame = new Gtk.Frame({
+        label_widget: displayFrameLabel,
+    });
+
+    let displayGrid = new Gtk.Grid({
+        column_spacing: 12,
+        row_spacing: 12,
+        margin_top: 12,
+        margin_bottom: 12,
+        margin_start: 12,
+        margin_end: 12,
+    });
 
     // Show Download toggle
-    const showDownloadRow = new Adw.ActionRow({
-      title: "Show Download Speed",
-      subtitle: "Display download speed (↓) in the panel",
+    let showDownloadLabel = new Gtk.Label({
+        label: 'Show Download Speed (↓)',
+        halign: Gtk.Align.START,
+        hexpand: true,
     });
-    const showDownloadSwitch = new Gtk.Switch({
-      active: settings.get_boolean("show-download"),
-      valign: Gtk.Align.CENTER,
+    let showDownloadSwitch = new Gtk.Switch({
+        active: settings.get_boolean('show-download'),
+        halign: Gtk.Align.END,
     });
-    settings.bind(
-      "show-download",
-      showDownloadSwitch,
-      "active",
-      Gio.SettingsBindFlags.DEFAULT,
-    );
-    showDownloadRow.add_suffix(showDownloadSwitch);
-    showDownloadRow.activatable_widget = showDownloadSwitch;
-    displayGroup.add(showDownloadRow);
+    settings.bind('show-download', showDownloadSwitch, 'active', Gio.SettingsBindFlags.DEFAULT);
+    displayGrid.attach(showDownloadLabel, 0, 0, 1, 1);
+    displayGrid.attach(showDownloadSwitch, 1, 0, 1, 1);
 
     // Show Upload toggle
-    const showUploadRow = new Adw.ActionRow({
-      title: "Show Upload Speed",
-      subtitle: "Display upload speed (↑) in the panel",
+    let showUploadLabel = new Gtk.Label({
+        label: 'Show Upload Speed (↑)',
+        halign: Gtk.Align.START,
+        hexpand: true,
     });
-    const showUploadSwitch = new Gtk.Switch({
-      active: settings.get_boolean("show-upload"),
-      valign: Gtk.Align.CENTER,
+    let showUploadSwitch = new Gtk.Switch({
+        active: settings.get_boolean('show-upload'),
+        halign: Gtk.Align.END,
     });
-    settings.bind(
-      "show-upload",
-      showUploadSwitch,
-      "active",
-      Gio.SettingsBindFlags.DEFAULT,
-    );
-    showUploadRow.add_suffix(showUploadSwitch);
-    showUploadRow.activatable_widget = showUploadSwitch;
-    displayGroup.add(showUploadRow);
+    settings.bind('show-upload', showUploadSwitch, 'active', Gio.SettingsBindFlags.DEFAULT);
+    displayGrid.attach(showUploadLabel, 0, 1, 1, 1);
+    displayGrid.attach(showUploadSwitch, 1, 1, 1, 1);
+
+    displayFrame.set_child(displayGrid);
 
     // =========================================================================
-    // Unit Settings Group
+    // Unit Settings Frame
     // =========================================================================
-    const unitGroup = new Adw.PreferencesGroup({
-      title: "Unit Settings",
-      description: "Configure how speed units are displayed",
+    let unitFrameLabel = new Gtk.Label({
+        label: '<b>Unit Settings</b>',
+        use_markup: true,
+        halign: Gtk.Align.START,
     });
-    page.add(unitGroup);
-
-    // Unit mode dropdown
-    const unitModeRow = new Adw.ActionRow({
-      title: "Unit Display Mode",
-      subtitle: "Choose how speed units are formatted",
+    let unitFrame = new Gtk.Frame({
+        label_widget: unitFrameLabel,
     });
 
-    const unitModeCombo = new Gtk.ComboBoxText({
-      valign: Gtk.Align.CENTER,
-    });
-    unitModeCombo.append("0", "Auto (KB/s ↔ MB/s)");
-    unitModeCombo.append("1", "KB/s only");
-    unitModeCombo.append("2", "MB/s only");
-    unitModeCombo.set_active_id(settings.get_int("unit-mode").toString());
-
-    unitModeCombo.connect("changed", () => {
-      settings.set_int("unit-mode", parseInt(unitModeCombo.get_active_id()));
+    let unitGrid = new Gtk.Grid({
+        column_spacing: 12,
+        row_spacing: 12,
+        margin_top: 12,
+        margin_bottom: 12,
+        margin_start: 12,
+        margin_end: 12,
     });
 
-    unitModeRow.add_suffix(unitModeCombo);
-    unitGroup.add(unitModeRow);
+    let unitModeLabel = new Gtk.Label({
+        label: 'Unit Display Mode',
+        halign: Gtk.Align.START,
+        hexpand: true,
+    });
+
+    let unitModeCombo = new Gtk.ComboBoxText({
+        halign: Gtk.Align.END,
+    });
+    unitModeCombo.append('0', 'Auto (KB/s ↔ MB/s)');
+    unitModeCombo.append('1', 'KB/s only');
+    unitModeCombo.append('2', 'MB/s only');
+    unitModeCombo.set_active_id(settings.get_int('unit-mode').toString());
+
+    unitModeCombo.connect('changed', () => {
+        settings.set_int('unit-mode', parseInt(unitModeCombo.get_active_id()));
+    });
+
+    unitGrid.attach(unitModeLabel, 0, 0, 1, 1);
+    unitGrid.attach(unitModeCombo, 1, 0, 1, 1);
+
+    unitFrame.set_child(unitGrid);
 
     // =========================================================================
-    // Update Interval Group
+    // Update Interval Frame
     // =========================================================================
-    const intervalGroup = new Adw.PreferencesGroup({
-      title: "Update Interval",
-      description: "Configure how often the speed is updated",
+    let intervalFrameLabel = new Gtk.Label({
+        label: '<b>Update Interval</b>',
+        use_markup: true,
+        halign: Gtk.Align.START,
     });
-    page.add(intervalGroup);
-
-    // Update interval dropdown
-    const intervalRow = new Adw.ActionRow({
-      title: "Refresh Rate",
-      subtitle: "Faster updates use more CPU and battery",
+    let intervalFrame = new Gtk.Frame({
+        label_widget: intervalFrameLabel,
     });
 
-    const intervalCombo = new Gtk.ComboBoxText({
-      valign: Gtk.Align.CENTER,
+    let intervalGrid = new Gtk.Grid({
+        column_spacing: 12,
+        row_spacing: 12,
+        margin_top: 12,
+        margin_bottom: 12,
+        margin_start: 12,
+        margin_end: 12,
     });
-    intervalCombo.append("0.5", "0.5 seconds");
-    intervalCombo.append("1", "1 second (default)");
-    intervalCombo.append("2", "2 seconds");
-    intervalCombo.append("5", "5 seconds");
 
-    // Set initial value
-    const currentInterval = settings.get_double("update-interval");
+    let intervalLabel = new Gtk.Label({
+        label: 'Refresh Rate',
+        halign: Gtk.Align.START,
+        hexpand: true,
+    });
+
+    let intervalCombo = new Gtk.ComboBoxText({
+        halign: Gtk.Align.END,
+    });
+    intervalCombo.append('0.5', '0.5 seconds');
+    intervalCombo.append('1', '1 second (default)');
+    intervalCombo.append('2', '2 seconds');
+    intervalCombo.append('5', '5 seconds');
+
+    let currentInterval = settings.get_double('update-interval');
     intervalCombo.set_active_id(currentInterval.toString());
 
-    intervalCombo.connect("changed", () => {
-      settings.set_double(
-        "update-interval",
-        parseFloat(intervalCombo.get_active_id()),
-      );
+    intervalCombo.connect('changed', () => {
+        settings.set_double('update-interval', parseFloat(intervalCombo.get_active_id()));
     });
 
-    intervalRow.add_suffix(intervalCombo);
-    intervalGroup.add(intervalRow);
+    intervalGrid.attach(intervalLabel, 0, 0, 1, 1);
+    intervalGrid.attach(intervalCombo, 1, 0, 1, 1);
+
+    intervalFrame.set_child(intervalGrid);
 
     // =========================================================================
-    // About Group
+    // About Frame
     // =========================================================================
-    const aboutGroup = new Adw.PreferencesGroup({
-      title: "About",
+    let aboutFrameLabel = new Gtk.Label({
+        label: '<b>About</b>',
+        use_markup: true,
+        halign: Gtk.Align.START,
     });
-    page.add(aboutGroup);
-
-    const aboutRow = new Adw.ActionRow({
-      title: "Net Speed Plus", // Updated title
-      subtitle: "Real-time network speed indicator for GNOME Shell",
+    let aboutFrame = new Gtk.Frame({
+        label_widget: aboutFrameLabel,
     });
-    aboutGroup.add(aboutRow);
 
-    // Set minimum window size
-    window.set_default_size(450, 500);
-  }
+    let aboutGrid = new Gtk.Grid({
+        column_spacing: 12,
+        row_spacing: 6,
+        margin_top: 12,
+        margin_bottom: 12,
+        margin_start: 12,
+        margin_end: 12,
+    });
+
+    let titleLabel = new Gtk.Label({
+        label: '<span weight="bold" size="large">Net Speed Plus</span>',
+        use_markup: true,
+        halign: Gtk.Align.START,
+    });
+
+    let descLabel = new Gtk.Label({
+        label: 'Real-time network speed indicator for GNOME Shell',
+        halign: Gtk.Align.START,
+    });
+
+    let versionLabel = new Gtk.Label({
+        label: 'Supports GNOME Shell 42-49',
+        halign: Gtk.Align.START,
+    });
+
+    aboutGrid.attach(titleLabel, 0, 0, 1, 1);
+    aboutGrid.attach(descLabel, 0, 1, 1, 1);
+    aboutGrid.attach(versionLabel, 0, 2, 1, 1);
+
+    aboutFrame.set_child(aboutGrid);
+
+    // Add all frames to main box (GTK4 uses append)
+    mainBox.append(displayFrame);
+    mainBox.append(unitFrame);
+    mainBox.append(intervalFrame);
+    mainBox.append(aboutFrame);
+
+    return mainBox;
 }
