@@ -1,4 +1,6 @@
-# 🌐 Net Speed Plus - GNOME Shell Extension
+<p align="center">
+  # 🌐 Net Speed Plus - GNOME Shell Extension
+</p>
 
 <p align="center">
   <strong>Real-time network speed indicator for your GNOME Shell top panel</strong>
