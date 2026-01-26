@@ -4,6 +4,8 @@ schemas/gschemas.compiled
 # Packaged extensions
 *.shell-extension.zip
 *.zip
+*.md
+!README.md
 
 # Logs
 *.log
