@@ -1,31 +1,10 @@
-/* prefs.js
- *
- * Net Speed Plus - GNOME Shell Extension Preferences
- * Compatible with GNOME Shell 42-49 using classic GJS syntax
- */
+import Gtk from 'gi://Gtk';
+import { getSettings } from 'resource:///org/gnome/shell/extensions/extension.js';
 
-const Gio = imports.gi.Gio;
-const Gtk = imports.gi.Gtk;
+export function buildPrefsWidget() {
+    const settings = getSettings('org.gnome.shell.extensions.netspeed_plus');
 
-const ExtensionUtils = imports.misc.extensionUtils;
-
-/**
- * Called when preferences are loaded (GNOME 42-44)
- */
-function init() {
-    // Nothing to initialize here
-}
-
-/**
- * Build the preferences widget (GNOME 42-44 compatible)
- * @returns {Gtk.Widget} The preferences widget
- */
-function buildPrefsWidget() {
-    let settings = ExtensionUtils.getSettings('org.gnome.shell.extensions.netspeed_plus');
-
-    // GNOME 42+ uses GTK4 for preferences
-    // Create the main box
-    let mainBox = new Gtk.Box({
+    const widget = new Gtk.Box({
         orientation: Gtk.Orientation.VERTICAL,
         margin_top: 24,
         margin_bottom: 24,
@@ -34,19 +13,16 @@ function buildPrefsWidget() {
         spacing: 18,
     });
 
-    // =========================================================================
-    // Display Settings Frame
-    // =========================================================================
-    let displayFrameLabel = new Gtk.Label({
+    const displayFrameLabel = new Gtk.Label({
         label: '<b>Display Settings</b>',
         use_markup: true,
         halign: Gtk.Align.START,
     });
-    let displayFrame = new Gtk.Frame({
+    const displayFrame = new Gtk.Frame({
         label_widget: displayFrameLabel,
     });
 
-    let displayGrid = new Gtk.Grid({
+    const displayGrid = new Gtk.Grid({
         column_spacing: 12,
         row_spacing: 12,
         margin_top: 12,
@@ -55,49 +31,44 @@ function buildPrefsWidget() {
         margin_end: 12,
     });
 
-    // Show Download toggle
-    let showDownloadLabel = new Gtk.Label({
+    const showDownloadLabel = new Gtk.Label({
         label: 'Show Download Speed (↓)',
         halign: Gtk.Align.START,
         hexpand: true,
     });
-    let showDownloadSwitch = new Gtk.Switch({
+    const showDownloadSwitch = new Gtk.Switch({
         active: settings.get_boolean('show-download'),
         halign: Gtk.Align.END,
     });
-    settings.bind('show-download', showDownloadSwitch, 'active', Gio.SettingsBindFlags.DEFAULT);
+    settings.bind('show-download', showDownloadSwitch, 'active', 0);
     displayGrid.attach(showDownloadLabel, 0, 0, 1, 1);
     displayGrid.attach(showDownloadSwitch, 1, 0, 1, 1);
 
-    // Show Upload toggle
-    let showUploadLabel = new Gtk.Label({
+    const showUploadLabel = new Gtk.Label({
         label: 'Show Upload Speed (↑)',
         halign: Gtk.Align.START,
         hexpand: true,
     });
-    let showUploadSwitch = new Gtk.Switch({
+    const showUploadSwitch = new Gtk.Switch({
         active: settings.get_boolean('show-upload'),
         halign: Gtk.Align.END,
     });
-    settings.bind('show-upload', showUploadSwitch, 'active', Gio.SettingsBindFlags.DEFAULT);
+    settings.bind('show-upload', showUploadSwitch, 'active', 0);
     displayGrid.attach(showUploadLabel, 0, 1, 1, 1);
     displayGrid.attach(showUploadSwitch, 1, 1, 1, 1);
 
     displayFrame.set_child(displayGrid);
 
-    // =========================================================================
-    // Unit Settings Frame
-    // =========================================================================
-    let unitFrameLabel = new Gtk.Label({
+    const unitFrameLabel = new Gtk.Label({
         label: '<b>Unit Settings</b>',
         use_markup: true,
         halign: Gtk.Align.START,
     });
-    let unitFrame = new Gtk.Frame({
+    const unitFrame = new Gtk.Frame({
         label_widget: unitFrameLabel,
     });
 
-    let unitGrid = new Gtk.Grid({
+    const unitGrid = new Gtk.Grid({
         column_spacing: 12,
         row_spacing: 12,
         margin_top: 12,
@@ -106,13 +77,13 @@ function buildPrefsWidget() {
         margin_end: 12,
     });
 
-    let unitModeLabel = new Gtk.Label({
+    const unitModeLabel = new Gtk.Label({
         label: 'Unit Display Mode',
         halign: Gtk.Align.START,
         hexpand: true,
     });
 
-    let unitModeCombo = new Gtk.ComboBoxText({
+    const unitModeCombo = new Gtk.ComboBoxText({
         halign: Gtk.Align.END,
     });
     unitModeCombo.append('0', 'Auto (KB/s ↔ MB/s)');
@@ -129,19 +100,16 @@ function buildPrefsWidget() {
 
     unitFrame.set_child(unitGrid);
 
-    // =========================================================================
-    // Update Interval Frame
-    // =========================================================================
-    let intervalFrameLabel = new Gtk.Label({
+    const intervalFrameLabel = new Gtk.Label({
         label: '<b>Update Interval</b>',
         use_markup: true,
         halign: Gtk.Align.START,
     });
-    let intervalFrame = new Gtk.Frame({
+    const intervalFrame = new Gtk.Frame({
         label_widget: intervalFrameLabel,
     });
 
-    let intervalGrid = new Gtk.Grid({
+    const intervalGrid = new Gtk.Grid({
         column_spacing: 12,
         row_spacing: 12,
         margin_top: 12,
@@ -150,13 +118,13 @@ function buildPrefsWidget() {
         margin_end: 12,
     });
 
-    let intervalLabel = new Gtk.Label({
+    const intervalLabel = new Gtk.Label({
         label: 'Refresh Rate',
         halign: Gtk.Align.START,
         hexpand: true,
     });
 
-    let intervalCombo = new Gtk.ComboBoxText({
+    const intervalCombo = new Gtk.ComboBoxText({
         halign: Gtk.Align.END,
     });
     intervalCombo.append('0.5', '0.5 seconds');
@@ -164,7 +132,7 @@ function buildPrefsWidget() {
     intervalCombo.append('2', '2 seconds');
     intervalCombo.append('5', '5 seconds');
 
-    let currentInterval = settings.get_double('update-interval');
+    const currentInterval = settings.get_double('update-interval');
     intervalCombo.set_active_id(currentInterval.toString());
 
     intervalCombo.connect('changed', () => {
@@ -176,19 +144,16 @@ function buildPrefsWidget() {
 
     intervalFrame.set_child(intervalGrid);
 
-    // =========================================================================
-    // About Frame
-    // =========================================================================
-    let aboutFrameLabel = new Gtk.Label({
+    const aboutFrameLabel = new Gtk.Label({
         label: '<b>About</b>',
         use_markup: true,
         halign: Gtk.Align.START,
     });
-    let aboutFrame = new Gtk.Frame({
+    const aboutFrame = new Gtk.Frame({
         label_widget: aboutFrameLabel,
     });
 
-    let aboutGrid = new Gtk.Grid({
+    const aboutGrid = new Gtk.Grid({
         column_spacing: 12,
         row_spacing: 6,
         margin_top: 12,
@@ -197,19 +162,19 @@ function buildPrefsWidget() {
         margin_end: 12,
     });
 
-    let titleLabel = new Gtk.Label({
+    const titleLabel = new Gtk.Label({
         label: '<span weight="bold" size="large">Net Speed Plus</span>',
         use_markup: true,
         halign: Gtk.Align.START,
     });
 
-    let descLabel = new Gtk.Label({
+    const descLabel = new Gtk.Label({
         label: 'Real-time network speed indicator for GNOME Shell',
         halign: Gtk.Align.START,
     });
 
-    let versionLabel = new Gtk.Label({
-        label: 'Supports GNOME Shell 42-49',
+    const versionLabel = new Gtk.Label({
+        label: 'Supports GNOME Shell 45-49',
         halign: Gtk.Align.START,
     });
 
@@ -219,11 +184,10 @@ function buildPrefsWidget() {
 
     aboutFrame.set_child(aboutGrid);
 
-    // Add all frames to main box (GTK4 uses append)
-    mainBox.append(displayFrame);
-    mainBox.append(unitFrame);
-    mainBox.append(intervalFrame);
-    mainBox.append(aboutFrame);
+    widget.append(displayFrame);
+    widget.append(unitFrame);
+    widget.append(intervalFrame);
+    widget.append(aboutFrame);
 
-    return mainBox;
+    return widget;
 }
