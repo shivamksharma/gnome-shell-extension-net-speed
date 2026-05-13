@@ -1,25 +1,40 @@
-# Compiled schemas
-schemas/gschemas.compiled
-
-# Packaged extensions
+# Build and packaging artifacts
+/build/
+/dist/
 *.shell-extension.zip
 *.zip
-*.md
-!README.md
 
-# Logs
-*.log
+# Compiled schemas (generated during build)
+schemas/gschemas.compiled
 
-# Editor directories
+# Localization build outputs
+/locale/
+
+# Preferences build artifacts (if any)
+/prefs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Editor and IDE
 .vscode/
 .idea/
 .project
 .settings/
 
-# OS generated files
+# OS generated
 .DS_Store
 Thumbs.db
+
+# Logs
+*.log
 
 # Backup files
 *~
 *.bak
+
+# Temporary/swap files
+*.swp
+*.swo
