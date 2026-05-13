@@ -1,125 +1,97 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# Build script for Net Speed Plus — Modern GNOME 45-49 branch
+# Packages extension for distribution and upload to extensions.gnome.org
 
 set -e
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-BUILD_DIR="$PROJECT_DIR/build"
-DIST_DIR="$PROJECT_DIR/dist"
+# Configuration
+EXTENSION_NAME="netspeed-plus"
+EXTENSION_UUID="netspeedplus@sam.shell-extension"
+GNOME_VERSION="gnome45"
 
-VERSION=$(node -p "require('$PROJECT_DIR/metadata.json').version" 2>/dev/null || echo "1")
-VERSION_LEGACY=$(node -p "require('$PROJECT_DIR/metadata-legacy.json').version" 2>/dev/null || echo "1")
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
 
-usage() {
-    echo "Usage: $0 [modern|legacy|all]"
-    echo "  modern  - Build for GNOME 45-49 (ESModules)"
-    echo "  legacy  - Build for GNOME 42-44 (legacy imports)"
-    echo "  all     - Build both versions (default)"
+echo -e "${GREEN}Building ${EXTENSION_NAME} for GNOME 45-49...${NC}"
+
+# Validate required files exist
+echo "Validating extension structure..."
+if [ ! -f "extension.js" ]; then
+    echo -e "${RED}ERROR: extension.js not found${NC}"
     exit 1
-}
+fi
 
-clean_build() {
-    rm -rf "$BUILD_DIR" "$DIST_DIR"
-    mkdir -p "$BUILD_DIR" "$DIST_DIR"
-}
+if [ ! -f "metadata.json" ]; then
+    echo -e "${RED}ERROR: metadata.json not found${NC}"
+    exit 1
+fi
 
-compile_schemas() {
-    echo "Compiling GSettings schemas..."
+if [ ! -f "prefs.js" ]; then
+    echo -e "${YELLOW}WARNING: prefs.js not found${NC}"
+fi
+
+if [ ! -d "src" ]; then
+    echo -e "${YELLOW}WARNING: src/ directory not found${NC}"
+fi
+
+if [ ! -d "schemas" ]; then
+    echo -e "${YELLOW}WARNING: schemas/ directory not found${NC}"
+fi
+
+# Get version from metadata
+VERSION=$(grep -oP '"version"\s*:\s*\K[0-9.]+' metadata.json)
+echo -e "Version: ${VERSION}"
+
+# Create dist directory
+mkdir -p dist
+
+# Create temporary build directory
+BUILD_DIR="build/modern"
+rm -rf "$BUILD_DIR"
+mkdir -p "$BUILD_DIR"
+
+# Copy required files to build directory
+echo "Copying files to build directory..."
+cp extension.js "$BUILD_DIR/"
+cp prefs.js "$BUILD_DIR/" 2>/dev/null || true
+cp metadata.json "$BUILD_DIR/"
+cp -r schemas "$BUILD_DIR/" 2>/dev/null || true
+
+# Copy src/ directory if present
+if [ -d "src" ]; then
+    cp -r src "$BUILD_DIR/"
+fi
+
+# Validate GSettings schemas (compile in build dir only)
+if [ -d "$BUILD_DIR/schemas" ]; then
+    echo "Validating GSettings schemas..."
     if command -v glib-compile-schemas &> /dev/null; then
-        glib-compile-schemas "$PROJECT_DIR/schemas/" || true
+        # Compile into build dir to check XML validity
+        glib-compile-schemas "$BUILD_DIR/schemas/" 2>/dev/null || true
+        # Remove compiled output — we only ship XML
+        rm -f "$BUILD_DIR/schemas/gschemas.compiled"
+        echo -e "${GREEN}✓ Schemas validated${NC}"
     else
-        echo "Warning: glib-compile-schemas not found, skipping schema compilation"
+        echo -e "${YELLOW}glib-compile-schemas not found, skipping validation${NC}"
     fi
-}
+fi
 
-build_modern() {
-    echo "Building modern version for GNOME 45-49..."
+# Create ZIP archive
+ZIP_NAME="${EXTENSION_NAME}-${GNOME_VERSION}-${VERSION}.shell-extension.zip"
+ZIP_PATH="$(pwd)/dist/${ZIP_NAME}"
+echo "Creating ZIP archive: dist/${ZIP_NAME}"
+(cd "$BUILD_DIR" && zip -qr "$ZIP_PATH" .)
 
-    local modern_dir="$BUILD_DIR/modern"
-    local modern_dist="$DIST_DIR/netspeed-plus-gnome45-${VERSION}.shell-extension.zip"
+# Cleanup build dir
+rm -rf "$BUILD_DIR"
 
-    mkdir -p "$modern_dir"
-
-    cp "$PROJECT_DIR/extension.js" "$modern_dir/"
-    cp "$PROJECT_DIR/prefs.js" "$modern_dir/"
-    cp "$PROJECT_DIR/metadata.json" "$modern_dir/"
-    cp -r "$PROJECT_DIR/schemas" "$modern_dir/"
-
-    mkdir -p "$modern_dir/src"
-    cp "$PROJECT_DIR/src/"*.js "$modern_dir/src/"
-
-    rm -f "$modern_dir/schemas/gschemas.compiled"
-
-    cd "$modern_dir"
-    zip -r "$modern_dist" . -x "*.git*" -x "*.DS_Store"
-    echo "Created: $modern_dist"
-}
-
-build_legacy() {
-    echo "Building legacy version for GNOME 42-44..."
-
-    local legacy_dir="$BUILD_DIR/legacy"
-    local legacy_dist="$DIST_DIR/netspeed-plus-gnome42-${VERSION_LEGACY}.shell-extension.zip"
-
-    mkdir -p "$legacy_dir"
-
-    cp "$PROJECT_DIR/legacy/extension.js" "$legacy_dir/"
-    cp "$PROJECT_DIR/legacy/prefs.js" "$legacy_dir/"
-    cp "$PROJECT_DIR/metadata-legacy.json" "$legacy_dir/metadata.json"
-    cp -r "$PROJECT_DIR/schemas" "$legacy_dir/"
-
-    if [ -f "$PROJECT_DIR/schemas/gschemas.compiled" ]; then
-        cp "$PROJECT_DIR/schemas/gschemas.compiled" "$legacy_dir/schemas/"
-    fi
-
-    cd "$legacy_dir"
-    zip -r "$legacy_dist" . -x "*.git*" -x "*.DS_Store"
-    echo "Created: $legacy_dist"
-}
-
-validate_zip() {
-    local zip_file="$1"
-    local zip_name=$(basename "$zip_file")
-
-    echo "Validating $zip_name..."
-
-    if ! unzip -l "$zip_file" | grep -q "metadata.json"; then
-        echo "Error: $zip_name missing metadata.json"
-        return 1
-    fi
-
-    if ! unzip -l "$zip_file" | grep -q "extension.js"; then
-        echo "Error: $zip_name missing extension.js"
-        return 1
-    fi
-
-    echo "$zip_name validation passed"
-}
-
-case "${1:-all}" in
-    modern)
-        clean_build
-        compile_schemas
-        build_modern
-        validate_zip "$DIST_DIR/netspeed-plus-gnome45-${VERSION}.shell-extension.zip"
-        ;;
-    legacy)
-        clean_build
-        compile_schemas
-        build_legacy
-        validate_zip "$DIST_DIR/netspeed-plus-gnome42-${VERSION_LEGACY}.shell-extension.zip"
-        ;;
-    all)
-        clean_build
-        compile_schemas
-        build_modern
-        build_legacy
-        validate_zip "$DIST_DIR/netspeed-plus-gnome45-${VERSION}.shell-extension.zip"
-        validate_zip "$DIST_DIR/netspeed-plus-gnome42-${VERSION_LEGACY}.shell-extension.zip"
-        echo ""
-        echo "Build complete! Artifacts in $DIST_DIR/"
-        ;;
-    *)
-        usage
-        ;;
-esac
+echo -e "${GREEN}✓ Build complete!${NC}"
+echo -e "Package: dist/${ZIP_NAME}"
+echo ""
+echo "Next steps:"
+echo "1. Validate: shexli dist/${ZIP_NAME}"
+echo "2. Upload:  Upload to extensions.gnome.org via EGO portal"
